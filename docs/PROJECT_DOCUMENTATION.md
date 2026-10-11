@@ -1,751 +1,515 @@
-# TRAVORA — Product & Technical Documentation
+# TRAVORA — Product & Services Documentation
 
-**Version:** 1.0.0
-**Status:** Initial development
-**Backend:** Java 17, Spring Boot 3.5.6
-**Database:** MySQL 8
-**Security:** Spring Security + JWT
-**Repository:** [https://github.com/MouhamedBenHenda/Travora](https://github.com/MouhamedBenHenda/Travora)
-
----
-
-# 00. Executive Summary
-
-## 0.1 Product Overview
-
-Travora is a travel, events, and social discovery platform designed to help people discover activities, create events, meet other travelers, and participate in shared experiences.
-
-Users can explore events, request participation, communicate through group chats, and connect with people who share similar interests.
-
-## 0.2 Product Objectives
-
-- Make discovering local activities easier.
-- Allow users to create and manage events.
-- Support participation requests and participant management.
-- Provide secure authentication and authorization.
-- Enable group communication between participants.
-- Support location-based event discovery.
-- Build a maintainable and scalable software architecture.
-
-## 0.3 Current Technology Stack
-
-| Component       | Technology                  |
-| --------------- | --------------------------- |
-| Backend         | Spring Boot 3.5.6           |
-| Language        | Java 17                     |
-| Database        | MySQL 8                     |
-| ORM             | Spring Data JPA / Hibernate |
-| Security        | Spring Security + JWT       |
-| Build tool      | Maven                       |
-| Version control | Git + GitHub                |
-| Frontend        | To be selected / documented |
-| Hosting         | To be selected              |
-
-## 0.4 Project Status
-
-The repository contains initial backend implementations for authentication, users, events, categories, participation, and group messaging.
-
-Production readiness has not yet been verified. Testing, authorization rules, database migrations, secret management, deployment, monitoring, and security hardening must be validated before release.
+**Version:** 1.0  
+**Project status:** Initial development  
+**Product category:** Travel, local activities and social discovery platform  
+**Backend:** Java 17 — Spring Boot 3.5.6  
+**Database:** MySQL 8  
+**Authentication:** Spring Security + JWT  
+**Repository:** https://github.com/MouhamedBenHenda/Travora
 
 ---
 
-# 01. Product Research
+# 1. Product Overview
 
-## 1.1 Vision
+## 1.1 What is Travora?
 
-Become a platform where people can discover destinations and activities, organize shared experiences, and connect with other travelers.
+Travora is a social travel and activity discovery platform designed to help people discover places, organize activities, create events and meet other people with similar interests.
 
-## 1.2 Problem Statement
+The platform allows users to explore activities, view event locations on an interactive map, request participation and communicate with other participants.
 
-Travelers and activity enthusiasts may struggle to find compatible people, discover relevant local events, and coordinate participation in group activities.
+Travora aims to make travel and local experiences more accessible by connecting people through shared activities.
 
-Travora aims to centralize event discovery, participation management, and communication.
+## 1.2 Product Vision
 
-## 1.3 Target Users
+To create a platform where users can discover new places, organize meaningful experiences and connect with people who share their interests.
 
-- Solo travelers looking for companions.
-- Students seeking social activities.
-- Local activity organizers.
-- Travelers interested in cultural and outdoor experiences.
-- People looking to discover activities near their location.
+## 1.3 Main Objectives
 
-## 1.4 Market Research
-
-Research should validate:
-
-- Demand for group travel and local activity discovery.
-- User expectations for trust, safety, and participant verification.
-- Preferred event categories and pricing models.
-- Adoption of location-based discovery.
-- Opportunities for differentiation.
-
-Potential research methods include competitor analysis, interviews, surveys, and prototype testing.
-
-## 1.5 Competitors
-
-Research products such as:
-
-- Meetup — community events and groups.
-- Couchsurfing — travel communities and social connections.
-- Eventbrite — event discovery and registration.
-- Nomadtable — social discovery and shared experiences.
-
-These are research references, not claims that Travora has feature parity with them.
-
-## 1.6 User Journey
-
-1. A visitor discovers Travora.
-2. The visitor creates an account or signs in.
-3. The user explores available events.
-4. The user opens an event and reviews its details.
-5. The user submits a participation request.
-6. The organizer reviews the request.
-7. Upon acceptance, the participant accesses the relevant group communication features.
-8. Participants attend the event and may discover other activities.
+- Discover local activities and travel experiences.
+- Create and manage events.
+- Find events based on location, date and category.
+- Request participation in events.
+- Manage participant requests.
+- Communicate through event-related group chats.
+- Encourage social interaction through shared experiences.
+- Provide a foundation for future travel-planning and recommendation services.
 
 ---
 
-# 02. Business Analysis
+# 2. Target Users
 
-## 2.1 Actors
+## 2.1 Travelers
 
-| Actor              | Responsibilities                             |
-| ------------------ | -------------------------------------------- |
-| Visitor            | Browse publicly available events             |
-| Authenticated user | Manage profile and request participation     |
-| Event organizer    | Create events and manage participation       |
-| Administrator      | Moderate users, events, and reported content |
-| System             | Enforce rules, security, and notifications   |
+People who want to explore destinations, discover activities and meet other travelers.
 
-The administrator role and visitor permissions must be explicitly implemented and verified.
+**Example:** A traveler visiting Sidi Bou Said can discover a walking tour or a photography activity organized by another user.
 
-## 2.2 Functional Requirements
+## 2.2 Students and Young Adults
 
-**FR-01 — Authentication**
+People looking for activities such as hiking, cultural visits, sports, outings and group adventures.
 
-- Users can register and sign in.
-- Passwords must be securely hashed.
-- Protected endpoints require valid authentication.
-- JWT expiration and invalid-token behavior must be enforced.
+**Example:** A student creates a weekend hiking event and invites other users to participate.
 
-**FR-02 — User Management**
+## 2.3 Event Organizers
 
-- Users can view and update permitted profile information.
-- Users cannot modify another user's protected data without authorization.
+Users who create activities and manage participation requests.
 
-**FR-03 — Event Management**
+**Example:** An organizer creates a cultural tour, defines the date and maximum number of participants, then approves requests.
 
-- Authorized users can create events.
-- Organizers can update or cancel their own events.
-- Users can retrieve event details and browse events.
-- Events can include dates, location, description, category, and capacity.
+## 2.4 Local Businesses — Future Extension
 
-**FR-04 — Categories**
+Tour operators, guides, hostels, restaurants and activity providers could eventually promote their experiences through Travora.
 
-- Events can be associated with categories.
-- Categories can be retrieved and managed by authorized actors.
-
-**FR-05 — Participation**
-
-- Users can request to participate in an event.
-- Organizers can accept or reject requests.
-- The system prevents duplicate requests and capacity violations.
-
-**FR-06 — Group Chat**
-
-- Authorized participants can access their group conversations.
-- Messages are persisted and associated with their sender and group.
-- Users cannot access unrelated private groups.
-
-**FR-07 — Location Discovery**
-
-- Events can store latitude and longitude.
-- Users can discover events based on geographic proximity.
-
-## 2.3 Non-Functional Requirements
-
-- **Security:** validate every protected operation on the server.
-- **Performance:** paginate event listings and avoid unnecessary database queries.
-- **Reliability:** use transactions for operations involving multiple database changes.
-- **Maintainability:** separate controllers, services, repositories, DTOs, and domain models.
-- **Observability:** log relevant failures without exposing passwords or tokens.
-- **Accessibility:** provide accessible interfaces and clear validation messages.
-- **Scalability:** keep external integrations and asynchronous workloads modular.
-
-Numeric performance targets should be defined after establishing expected traffic and measuring a baseline.
-
-## 2.4 Business Rules
-
-1. A user must be authenticated to request participation.
-2. Only the event organizer or an authorized administrator may manage an event.
-3. An event cannot accept more participants than its configured capacity.
-4. A user must not have multiple active participation requests for the same event.
-5. Only accepted participants and authorized organizers may access event-specific group chats.
-6. A cancelled event must not accept new participation requests.
-7. Users may modify only resources for which they have the necessary permissions.
-8. Event start and end dates must be valid.
-9. Latitude must be between -90 and 90; longitude must be between -180 and 180.
-
-## 2.5 Use Cases
-
-| ID    | Use case                  | Primary actor          |
-| ----- | ------------------------- | ---------------------- |
-| UC-01 | Register and sign in      | Visitor                |
-| UC-02 | Browse events             | Visitor / User         |
-| UC-03 | Create an event           | Organizer              |
-| UC-04 | Update an event           | Organizer              |
-| UC-05 | Request participation     | User                   |
-| UC-06 | Approve participation     | Organizer              |
-| UC-07 | Send a group message      | Authorized participant |
-| UC-08 | Manage categories         | Administrator          |
-| UC-09 | Moderate reported content | Administrator          |
-
-## 2.6 Acceptance Criteria
-
-Example: requesting participation.
-
-- Given an authenticated user and an open event with available capacity, when the user requests participation, a request is created.
-- If the same user submits a duplicate request, the system rejects it or returns the existing request according to the API contract.
-- If the event is full or cancelled, the request is rejected.
-- If the user is unauthenticated, the endpoint returns HTTP 401.
-- If the user is authenticated but unauthorized, the endpoint returns HTTP 403 where appropriate.
+This service is a proposed future extension and is not considered implemented unless the corresponding features are developed.
 
 ---
 
-# 03. Domain Design
+# 3. Core Services
 
-## 3.1 Core Entities
+## 3.1 User Authentication and Profiles
 
-The current codebase includes the following model concepts:
+Users can create an account and access personalized platform features.
 
-- User
-- Event
-- Category
-- Participation
-- GroupEvent
-- ChatGroup
-- Chat
-- Message
-- ChatParticipation
-- UserMessageStatus
+### Main functionalities
 
-Confirm each entity's final responsibilities and relationships against the actual Java classes.
+- User registration.
+- User login.
+- JWT-based authentication.
+- Secure password storage.
+- User profile management.
+- Access control for protected operations.
 
-## 3.2 Domain Relationships
+### Expected result
 
-Proposed conceptual relationships:
+Each authenticated user can manage their own profile and access only the resources authorized for them.
 
-- A User can organize multiple Events.
-- An Event belongs to a Category.
-- A User can request participation in multiple Events.
-- An Event can have multiple Participation records.
-- A GroupEvent connects an event to its group-related functionality.
-- A ChatGroup contains multiple Messages.
-- A Message has one sender and belongs to one group.
-- ChatParticipation controls membership in a group.
+## 3.2 Explore Activities and Events
 
-Use explicit JPA mappings and database constraints to enforce the intended relationships.
+Travora provides a central place to discover activities created by users.
 
-## 3.3 Aggregates
+### Main functionalities
 
-Suggested aggregate boundaries:
+- Display available events.
+- View event descriptions and images, when supported.
+- View event dates and locations.
+- Filter events by category.
+- Search by destination or location.
+- Display event details.
+- View participant capacity and availability.
 
-**Event aggregate**
+### Example
 
-- Event
-- Event capacity and lifecycle rules
-- Participation decisions, where transactionally appropriate
+A user searches for outdoor activities in Tunisia and discovers a hiking event organized for the weekend.
 
-**ChatGroup aggregate**
+## 3.3 Event Creation and Management
 
-- ChatGroup
-- Message membership and authorization rules
+Authenticated users can organize their own activities.
 
-**User aggregate**
+### Event information
 
-- User profile and authentication identity
+- Event title.
+- Description.
+- Category.
+- Start and end dates.
+- Location name.
+- Latitude and longitude.
+- Maximum number of participants.
+- Organizer.
+- Event status.
 
-Do not assume that these boundaries already exist in the implementation. Refine them as the application grows.
+### Organizer services
 
-## 3.4 Domain Events
+- Create an event.
+- Update event details.
+- Cancel an event.
+- View participation requests.
+- Accept or reject requests.
+- Monitor participant capacity.
 
-Potential future domain events:
+### Business rules
 
-- `UserRegistered`
-- `EventCreated`
-- `ParticipationRequested`
-- `ParticipationAccepted`
-- `ParticipationRejected`
-- `EventCancelled`
-- `MessageSent`
+- Only authorized users can create events.
+- Only the organizer or an authorized administrator can manage an event.
+- Event dates must be valid.
+- An event cannot accept more participants than its capacity.
+- Cancelled events cannot accept new participation requests.
 
-Initially, these can be handled using Spring application events where suitable. For reliable delivery to external systems, consider a transactional outbox and a message broker when justified.
+## 3.4 Interactive Map and Geographic Discovery
 
----
+Travora can use a map to help users discover activities based on their geographical location.
 
-# 04. System Architecture
+### Main functionalities
 
-## 4.1 Architecture
+- Display event markers on a map.
+- Associate each event with latitude and longitude.
+- Display event information when a marker is selected.
+- Open the corresponding event details.
+- Filter events by geographic area.
+- Support location-based discovery.
 
-Use a layered Spring Boot architecture:
+### Example user journey
 
-Client → REST Controller → Service → Repository → MySQL
+1. The user opens the Explore Map page.
+2. The map displays events in the selected area.
+3. The user selects an event marker.
+4. Travora displays the event title, date, location and available information.
+5. The user opens the event details.
+6. The user submits a participation request.
 
-Security filters validate authentication before protected requests reach application logic.
+### Technical considerations
 
-## 4.2 Backend Structure
+The backend stores geographical coordinates. A mapping provider such as Google Maps or OpenStreetMap can be integrated into the frontend.
 
-```text
-src/main/java/org/example/travora/
-├── Config/
-│   ├── SecurityConfig.java
-│   └── JwtAuthentificationFilter.java
-├── Mapper/
-├── controller/
-├── dto/
-│   ├── request/
-│   └── response/
-├── model/
-├── repository/
-├── service/
-│   ├── interfaceS/
-│   └── implementation classes
-└── TravoraApplication.java
-```
+Automatic address lookup and coordinate generation require a geocoding service; they do not happen automatically just because latitude and longitude fields exist.
 
-The structure reflects the current project organization. Standardize package naming and capitalization gradually without introducing unnecessary breaking changes.
+## 3.5 Participation Management
 
-## 4.3 Frontend
+Travora allows users to request participation in activities created by other users.
 
-The frontend technology and implementation status must be documented separately.
+### Participant functionalities
 
-Expected responsibilities:
+- View event details.
+- Submit a participation request.
+- Check the request status.
+- Access event-related communication when authorized.
 
-- Authentication and account management.
-- Event listing, details, and filters.
-- Event creation and editing.
-- Participation management.
-- Map-based discovery.
-- Group chat and notifications.
+### Organizer functionalities
 
-## 4.4 Infrastructure
+- View participation requests.
+- Accept a request.
+- Reject a request.
+- Manage the participant list.
 
-Initial development infrastructure:
+### Suggested participation statuses
 
-- Java 17
-- Maven
-- MySQL 8
-- GitHub
+- `PENDING`
+- `ACCEPTED`
+- `REJECTED`
+- `CANCELLED`
 
-Production infrastructure remains to be selected.
+These statuses must be aligned with the actual Java enum and database implementation.
 
-## 4.5 Event Architecture
+### Example workflow
 
-For the first release, use synchronous service calls and database transactions for critical operations.
+User A creates a hiking event. User B requests participation. The organizer reviews the request and accepts it. User B can then access the features reserved for accepted participants.
 
-Introduce asynchronous processing for notifications, email delivery, or other background work when required. Do not introduce Kafka or other infrastructure without a concrete need.
+## 3.6 Group Chat and Communication
 
----
+Travora can provide group communication associated with activities and events.
 
-# 05. Database Design
+### Main functionalities
 
-## 5.1 Database Tables
+- Create or access an event-related chat group.
+- Display group messages.
+- Send messages.
+- Associate each message with its sender.
+- Store message history.
+- Manage group membership.
 
-Expected tables correspond to the domain entities and their associations, including:
+### Access rules
 
-- `users`
-- `events`
-- `categories`
-- `participations`
-- `group_events`
-- `chat_groups`
-- `messages`
-- `chat_participations`
-- Additional message status tables, if required by the implementation.
+- Only authorized users can access private groups.
+- Only group members can send messages.
+- Organizers may have additional management permissions.
+- Users must not access conversations belonging to unrelated groups.
 
-Actual table names must be confirmed from Hibernate mappings and the database schema.
+Real-time messaging can be implemented with WebSocket and STOMP if it is part of the selected architecture.
 
-## 5.2 Constraints
+## 3.7 Categories and Activity Discovery
 
-Recommended constraints:
+Categories help users find activities that match their interests.
 
-- Primary key on every table.
-- Foreign keys for entity relationships.
-- Unique email for users.
-- Unique participation per user and event, according to the chosen lifecycle model.
-- Non-null constraints for required attributes.
-- Valid event dates and geographic coordinates.
-- Database-level protection against invalid references.
+### Example categories
 
-## 5.3 Indexes
+- Hiking and outdoor activities.
+- Cultural visits.
+- Food and local experiences.
+- Sports.
+- Photography.
+- Nightlife.
+- Road trips.
+- Adventure activities.
 
-Evaluate indexes for:
+These categories are proposed examples and should be adapted to the actual category data.
 
-- User email.
-- Event start date.
-- Event category and status.
-- Event geographic filtering.
-- Participation event ID and user ID.
-- Chat group ID and message creation time.
+### Main functionalities
 
-Create indexes based on query patterns and execution plans, rather than adding every possible index.
-
-## 5.4 Migrations
-
-Use Flyway or Liquibase to version schema changes.
-
-Production environments should apply reviewed migrations rather than relying on automatic Hibernate schema updates.
-
-## 5.5 Row-Level Security
-
-MySQL does not provide PostgreSQL-style RLS policies as a standard feature.
-
-Implement authorization in the service layer and enforce database constraints. If PostgreSQL is selected later, evaluate native RLS as an additional security layer.
+- Display available categories.
+- Associate events with categories.
+- Filter event listings by category.
+- Allow authorized administrators to manage categories.
 
 ---
 
-# 06. API Design
+# 4. Proposed Future Services
 
-## 6.1 API Conventions
+The following services can extend Travora beyond its initial event-management features. They are proposals, not claims about the current implementation.
 
-- Base path: `/api`
+## 4.1 Future Trip Planning
+
+Users could add upcoming trips, including destinations and travel dates.
+
+Travora could then identify activities and other users visiting the same destination during overlapping periods.
+
+**Example:** A user planning to visit Paris in December discovers an existing group planning a city tour.
+
+## 4.2 Personalized Recommendations
+
+Travora could recommend activities based on:
+
+- Preferred categories.
+- Selected destinations.
+- Upcoming travel dates.
+- Previously viewed or joined activities.
+- Available event capacity.
+
+An AI-based recommendation service could be considered later, after collecting sufficient relevant data and defining privacy safeguards.
+
+## 4.3 Notifications
+
+Users could receive notifications when:
+
+- A participation request is accepted or rejected.
+- An organizer updates an event.
+- An event is cancelled.
+- A new message arrives in an authorized group.
+- An upcoming event is approaching.
+
+Email, push notifications and in-app notifications can be introduced incrementally.
+
+## 4.4 Reviews and Community Trust
+
+A future reputation system could help users evaluate shared experiences.
+
+Possible features include:
+
+- Post-event feedback.
+- Reporting inappropriate content.
+- Blocking abusive accounts.
+- Organizer profiles.
+- Community moderation.
+
+Reviews and reputation scores should be designed to limit spam, harassment and fraudulent feedback.
+
+## 4.5 Business and Tourism Partnerships
+
+Travora could allow verified local businesses to publish promoted activities or tourism experiences.
+
+Potential services include:
+
+- Business profiles.
+- Promoted activity listings.
+- External booking links.
+- Campaign management.
+- Activity engagement analytics.
+- Partner dashboards.
+
+Any paid promotion service would require its own business model, payment integration, moderation process and transparent advertising labels.
+
+## 4.6 Live Location Sharing
+
+Users could optionally share their location during an activity to help participants find a meeting point.
+
+This feature would require explicit consent, limited sharing duration, appropriate access controls and clear privacy settings.
+
+---
+
+# 5. Main User Journeys
+
+## 5.1 Discover and Join an Event
+
+1. The user signs in.
+2. The user opens the event discovery page.
+3. The user filters events by category or location.
+4. The user selects an event.
+5. The user reviews its details.
+6. The user requests participation.
+7. The organizer reviews the request.
+8. The user receives the decision.
+9. If accepted, the user accesses the authorized event communication features.
+
+## 5.2 Create and Manage an Event
+
+1. The organizer signs in.
+2. The organizer opens the event creation form.
+3. The organizer enters the event information.
+4. The organizer selects a category.
+5. The organizer defines the date, location and capacity.
+6. The system validates the submitted data.
+7. The event is created.
+8. The organizer manages participation requests.
+
+## 5.3 Communicate with Participants
+
+1. A user becomes an authorized member of an event group.
+2. The user opens the associated chat.
+3. The user retrieves previous messages.
+4. The user sends a message.
+5. The system validates group membership and persists the message.
+6. Other authorized members can retrieve the message.
+
+---
+
+# 6. Business Rules and Safety
+
+Travora should establish clear rules to protect users and ensure reliable event management.
+
+- Users must be authenticated before performing protected actions.
+- Users can modify only resources they own or are authorized to manage.
+- Participation requests must respect event status and capacity.
+- Duplicate active participation requests must be prevented.
+- Private group conversations must remain restricted to authorized members.
+- Invalid dates and geographical coordinates must be rejected.
+- Users should be able to report inappropriate events or messages when moderation is implemented.
+- Sensitive information, passwords and JWT secrets must never be exposed in API responses or logs.
+
+Safety and moderation features should be treated as part of the product design, not merely as optional interface elements.
+
+---
+
+# 7. Product Architecture
+
+## 7.1 Backend
+
+The current backend technology stack includes:
+
+- Java 17.
+- Spring Boot 3.5.6.
+- Spring Security.
+- JWT authentication.
+- Spring Data JPA and Hibernate.
+- MySQL 8.
+- Maven.
+
+The existing repository includes domain concepts for users, events, categories, participation and group messaging. Their exact implementation and completeness should be verified against the source code.
+
+## 7.2 Main Backend Modules
+
+| Module | Responsibility |
+|---|---|
+| Authentication | Registration, login and token validation |
+| Users | Profile and user-related operations |
+| Events | Event creation, updates and discovery |
+| Categories | Activity classification |
+| Participation | Requests and participant management |
+| Chat | Group membership and messages |
+| Location | Geographic event data and future map queries |
+| Administration | Future moderation and platform management |
+
+## 7.3 Suggested Architecture
+
+Client application → REST API → Controller → Service → Repository → MySQL.
+
+A mapping provider, notification provider or recommendation service can be integrated through separate modules when required.
+
+## 7.4 API Design
+
+The API should use:
+
+- REST endpoints.
 - JSON request and response bodies.
-- Use DTOs rather than exposing JPA entities directly.
-- Validate input with Jakarta Bean Validation.
-- Return consistent HTTP status codes.
-- Document endpoints with OpenAPI/Swagger.
-- Use pagination for collections.
+- DTOs and server-side validation.
+- Consistent HTTP status codes.
+- Centralized exception handling.
+- Pagination for event listings.
+- Authentication and authorization for protected resources.
 
-## 6.2 Proposed REST Endpoints
-
-The routes below are a design proposal; verify them against the existing controllers before implementation.
-
-| Method | Endpoint                          | Purpose                     |
-| ------ | --------------------------------- | --------------------------- |
-| POST   | `/api/auth/signup`                | Register                    |
-| POST   | `/api/auth/signin`                | Authenticate                |
-| GET    | `/api/events`                     | List events                 |
-| POST   | `/api/events`                     | Create event                |
-| GET    | `/api/events/{id}`                | Retrieve event              |
-| PUT    | `/api/events/{id}`                | Update event                |
-| DELETE | `/api/events/{id}`                | Delete or cancel event      |
-| POST   | `/api/events/{id}/participations` | Request participation       |
-| GET    | `/api/events/{id}/participations` | List requests               |
-| PATCH  | `/api/participations/{id}`        | Decide participation status |
-| GET    | `/api/categories`                 | List categories             |
-| GET    | `/api/chat-groups/{id}/messages`  | Retrieve group messages     |
-| POST   | `/api/chat-groups/{id}/messages`  | Send a message              |
-
-## 6.3 DTO Validation
-
-Examples:
-
-- Email: `@NotBlank` and `@Email`.
-- Password: `@NotBlank` with an appropriate minimum length.
-- Event description: `@NotBlank` and `@Size`.
-- Capacity: `@Min(1)`.
-- Coordinates: `@DecimalMin` and `@DecimalMax`, with appropriate bounds.
-- Dates: validate the start/end relationship in the service layer.
-
-## 6.4 Error Handling
-
-Adopt a consistent error response:
-
-```json
-{
-  "timestamp": "2026-10-11T10:00:00Z",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Invalid event data",
-  "path": "/api/events"
-}
-```
-
-Implement centralized exception handling with `@RestControllerAdvice`.
-
-Never return stack traces, database credentials, JWT secrets, or internal exception details to clients.
+Actual routes must be documented from the implemented controllers rather than assumed from this product specification.
 
 ---
 
-# 07. UI/UX Design
+# 8. Product Development Roadmap
 
-## 7.1 Main Navigation
+## Phase 1 — Core Platform
 
-Suggested navigation:
+- Complete authentication.
+- Complete event management.
+- Implement categories.
+- Implement participation requests.
+- Validate ownership and authorization.
+- Complete basic group messaging.
 
-- Home
-- Explore
-- Map
-- Create Event
-- My Events
-- Messages
-- Profile
+## Phase 2 — Discovery Experience
 
-Administrative screens should be accessible only to authorized administrators.
+- Event search and filters.
+- Map integration.
+- Geographic discovery.
+- Event capacity and availability display.
+- Improved event details and user profiles.
 
-## 7.2 Design System
+## Phase 3 — Social Experience
 
-Define shared design tokens for:
+- Real-time chat, if required.
+- In-app notifications.
+- Event updates and cancellation notifications.
+- Reporting and moderation tools.
 
-- Primary and secondary colors.
-- Typography.
-- Spacing.
-- Buttons and form controls.
-- Cards and dialogs.
-- Loading, empty, error, and success states.
+## Phase 4 — Advanced Travel Services
 
-## 7.3 Core Screens
+- Future trip planning.
+- Destination-based user discovery.
+- Personalized recommendations.
+- Reviews and organizer reputation.
 
-1. Landing page.
-2. Sign-up and sign-in.
-3. Event discovery.
-4. Event details.
-5. Event creation form.
-6. Participation management.
-7. Interactive map.
-8. Group chat.
-9. User profile.
-10. Administration and moderation.
+## Phase 5 — Business Services
 
-## 7.4 User Flows
-
-Design and validate these flows before implementation:
-
-- Register → Sign in → Explore.
-- Create Event → Publish → Manage Requests.
-- Explore → Event Details → Request Participation.
-- Request Accepted → Open Authorized Group Chat.
-- Report Content → Administrative Review.
+- Verified business accounts.
+- Promoted activities.
+- Partner dashboards.
+- Campaign analytics.
+- Booking links and optional monetization.
 
 ---
 
-# 08. Development Standards
+# 9. Product Success Metrics
 
-## 8.1 Coding Guidelines
+Travora can measure product adoption and engagement through metrics such as:
 
-- Keep controllers thin.
-- Place business logic in services.
-- Use repositories for persistence.
-- Use DTOs for external API contracts.
-- Validate all client-controlled input.
-- Enforce authorization on every sensitive operation.
-- Use transactions for related database updates.
-- Avoid logging credentials, passwords, and tokens.
+- Number of registered users.
+- Number of published events.
+- Number of participation requests.
+- Participation acceptance rate.
+- Percentage of events reaching their participant capacity.
+- Number of active users.
+- Number of messages sent in authorized groups.
+- Event cancellation rate.
+- User satisfaction after activities.
 
-## 8.2 Naming Conventions
-
-| Element    | Convention            | Example           |
-| ---------- | --------------------- | ----------------- |
-| Class      | PascalCase            | `EventService`    |
-| Method     | camelCase             | `createEvent()`   |
-| Constant   | UPPER_SNAKE_CASE      | `MAX_CAPACITY`    |
-| DTO        | Descriptive suffix    | `EventRequest`    |
-| Repository | Entity + Repository   | `EventRepository` |
-| Endpoint   | Plural resource names | `/api/events`     |
-
-## 8.3 Git Workflow
-
-- `main`: stable, release-ready code.
-- `feature/<name>`: new features.
-- `fix/<name>`: bug fixes.
-- `docs/<name>`: documentation changes.
-
-Example:
-
-```bash
-git checkout -b feature/event-search
-git add .
-git commit -m "Add event search"
-git push -u origin feature/event-search
-```
-
-Open a pull request and review changes before merging into `main`.
-
-## 8.4 Secrets Management
-
-Never commit real passwords, JWT secrets, SMTP credentials, or production tokens.
-
-Use environment variables or a secret manager. Provide an `application-example.properties` file containing placeholders instead of real values.
+These metrics should be defined carefully and collected with appropriate privacy safeguards.
 
 ---
 
-# 09. Testing Strategy
+# 10. Product Positioning
 
-## 9.1 Unit Tests
+Travora is intended to combine three principal experiences:
 
-Test:
+1. **Discover:** find events, destinations and activities.
+2. **Participate:** request to join activities and coordinate with organizers.
+3. **Connect:** communicate with other participants through shared experiences.
 
-- Event creation rules.
-- Participation capacity rules.
-- Duplicate participation handling.
-- Ownership and permission decisions.
-- DTO validation.
-- Authentication and token validation.
+The long-term objective is to evolve from a basic event-management platform into a broader travel and social discovery service.
 
-Tools: JUnit 5, Mockito, and AssertJ where appropriate.
-
-## 9.2 Integration Tests
-
-Test:
-
-- Repository mappings.
-- Database constraints.
-- Authentication endpoints.
-- Event and participation workflows.
-- Authorization for private resources.
-- Transaction rollback behavior.
-
-Use an isolated test database or Testcontainers.
-
-## 9.3 End-to-End Tests
-
-Validate complete workflows:
-
-1. Register and authenticate.
-2. Create an event.
-3. Submit a participation request.
-4. Approve the request as organizer.
-5. Access the authorized group.
-6. Send and retrieve a message.
-7. Confirm unauthorized access is rejected.
-
-## 9.4 Release Gates
-
-A release should require:
-
-- Successful compilation.
-- Passing automated tests.
-- No known critical security issues.
-- Valid database migrations.
-- Working authentication and authorization.
-- No committed secrets.
-- A documented rollback procedure.
+The product should prioritize a reliable event and participation workflow before introducing advanced services such as AI recommendations, business advertising or live location sharing.
 
 ---
 
-# 10. Deployment
+# 11. Reference Product
 
-## 10.1 CI/CD
+Nomadtable is a reference for researching social activity discovery and travel-related community services.
 
-Recommended pipeline:
+Official references:
 
-1. Trigger on pull requests and pushes.
-2. Set up Java 17.
-3. Build with Maven.
-4. Run unit and integration tests.
-5. Perform dependency and secret scanning.
-6. Build a Docker image.
-7. Deploy to staging.
-8. Run smoke tests.
-9. Promote to production after approval.
+- Website: https://www.nomadtable.app/
+- App Store listing: https://apps.apple.com/us/app/nomadtable-travel-friends/id6736921913
+- Partner services: https://nomadtable.app/partnerships
 
-## 10.2 Environment Variables
-
-Example configuration:
-
-```properties
-spring.datasource.url=${DB_URL}
-spring.datasource.username=${DB_USERNAME}
-spring.datasource.password=${DB_PASSWORD}
-
-jwt.secret=${JWT_SECRET}
-```
-
-Adapt the property names to the actual configuration classes and JWT implementation.
-
-Production secrets must be generated securely and supplied by the deployment environment.
-
-## 10.3 Hosting
-
-Choose a hosting provider based on budget, regional latency, database support, and operational needs.
-
-Minimum production components:
-
-- Backend application hosting.
-- Managed or securely operated MySQL.
-- HTTPS.
-- Secret management.
-- Automated backups.
-- Application logs and health monitoring.
-
-## 10.4 Monitoring
-
-Track:
-
-- Application availability.
-- HTTP error rates.
-- Response times.
-- Database connectivity and query performance.
-- JVM memory and CPU.
-- Authentication failures.
-- Deployment failures.
-
-Configure alerts for service outages and failed backups.
+These references are for product research and inspiration. Travora should define its own user experience, business rules and implementation rather than assume that it already provides the same services.
 
 ---
 
-# 11. Roadmap
+# Final Principle
 
-## Phase 1 — Foundation
+Travora's documentation distinguishes between existing implementation, planned features and future business opportunities.
 
-- [x] Initialize Spring Boot project.
-- [x] Create initial GitHub repository.
-- [x] Implement initial domain models and backend layers.
-- [ ] Review entity relationships and schema.
-- [ ] Finalize API contracts.
-- [ ] Protect all secrets.
-
-## Phase 2 — Core Features
-
-- [ ] Complete registration and authentication.
-- [ ] Complete event CRUD and ownership checks.
-- [ ] Implement category management.
-- [ ] Complete participation workflows.
-- [ ] Enforce group chat membership and permissions.
-- [ ] Add event filtering and pagination.
-
-## Phase 3 — User Experience
-
-- [ ] Implement frontend.
-- [ ] Build event discovery and detail pages.
-- [ ] Integrate map and geographic search.
-- [ ] Build participation management.
-- [ ] Integrate real-time messaging if required.
-- [ ] Add responsive design and accessibility.
-
-## Phase 4 — Quality and Security
-
-- [ ] Unit and integration tests.
-- [ ] End-to-end critical workflows.
-- [ ] Authorization review.
-- [ ] Database migration strategy.
-- [ ] Rate limiting and abuse protection.
-- [ ] Logging and monitoring.
-
-## Phase 5 — Production Release
-
-- [ ] Dockerize the application.
-- [ ] Configure CI/CD.
-- [ ] Provision production database.
-- [ ] Configure HTTPS and secrets.
-- [ ] Test backup restoration.
-- [ ] Deploy to staging.
-- [ ] Complete production smoke tests.
-- [ ] Release with a rollback plan.
-
----
-
-# Definition of Done
-
-A feature is considered complete when:
-
-- Its requirements and acceptance criteria are documented.
-- Its implementation follows project conventions.
-- Input validation and authorization are enforced.
-- Relevant automated tests pass.
-- API documentation is updated.
-- No secrets are committed.
-- Changes are reviewed and merged.
-- Deployment and operational impacts are documented.
-
-**Final principle:** document the actual state of the code honestly. Mark features as implemented only after verifying their behavior, and mark proposed architecture and infrastructure as planned until they exist and have been tested.
+A service should be marked as implemented only after its backend behavior, security rules and user workflow have been verified.
