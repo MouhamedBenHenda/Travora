@@ -8,11 +8,11 @@ import org.example.travora.model.Message;
 import java.util.List;
 
 public interface ChatGroupInterface {
-    ChatGroup createChatGroupe(ChatGroupRequest chatGroupRequest);
+    ChatGroup createChatGroupe(ChatGroupRequest chatGroupRequest , String createrId);
 
-    List<ChatGroup> getAllChatGroups();
+    List<ChatGroupResponse> getAllChatGroups();
 
-    ChatGroup getChatGroupById(String groupId);
+    ChatGroupResponse getChatGroupById(String groupId);
 
     ChatGroup updateChatGroup(String groupId, ChatGroupResponse chatGroupResponse);
 

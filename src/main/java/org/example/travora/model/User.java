@@ -49,16 +49,13 @@ private LocalDateTime lastSeen ;
             this.id = UUID.randomUUID().toString();
         }
     }
-@ManyToOne
-@JsonIgnore
-@JoinColumn(name = "chat_group_Id")
-private ChatGroup chatGroup ;
+
 
 @OneToMany(cascade = CascadeType.ALL , mappedBy = "user")
 private List<GroupEvent> groupEvents ;
 
-
-
+@OneToMany(cascade = CascadeType.ALL , mappedBy = "user")
+private List<ChatGroup> chatGroups ;
 
     @Transient
     public boolean isUseronline() { // difiend is user online or not

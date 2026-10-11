@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -52,5 +53,13 @@ private Long nbr_Of_Personne ;
             this.id = UUID.randomUUID().toString();
         }
     }
+
+    private LocalDateTime startDateSale ;
+    private  LocalDateTime finalDateofSale ;
+
+
+
+    @Enumerated(EnumType.STRING)
+    private EventType eventType ;
 
 }

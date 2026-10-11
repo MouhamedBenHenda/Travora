@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ChatController {
     private  final ChatGroupInterface chatGroupService ;
-    @PostMapping
+    @PostMapping ("/{createrId}")
     public ResponseEntity<ChatGroup> createChatGroupe(
-            @RequestBody ChatGroupRequest chatGroupRequest) {
+            @RequestBody ChatGroupRequest chatGroupRequest , @PathVariable String createrId ) {
 
         ChatGroup chatGroup =
-                chatGroupService.createChatGroupe(chatGroupRequest);
+                chatGroupService.createChatGroupe(chatGroupRequest , createrId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(chatGroup);
     }

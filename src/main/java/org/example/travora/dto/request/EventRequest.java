@@ -1,10 +1,14 @@
 package org.example.travora.dto.request;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.travora.model.EventType;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -25,5 +29,9 @@ public class EventRequest {
     private Double longitude;
 
     private Long nbr_Of_Personne ;
+    private LocalDateTime startDateSale ;
+    private  LocalDateTime finalDateofSale ;
+    @Enumerated(EnumType.STRING)
+    private EventType eventType ;
 
 }

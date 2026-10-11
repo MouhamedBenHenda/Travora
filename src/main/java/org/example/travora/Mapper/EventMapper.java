@@ -21,6 +21,9 @@ public class EventMapper {
             response.setLongitude(event.getLongitude());
             response.setNbr_Of_Personne(event.getNbr_Of_Personne());
             response.setRole(event.getRole());
+            response.setStartDateSale(event.getStartDateSale());
+            response.setFinalDateofSale(event.getFinalDateofSale());
+            response.setEventType(event.getEventType());
 
             response.setUserId(
                     event.getUser() == null ? null : event.getUser().getId()

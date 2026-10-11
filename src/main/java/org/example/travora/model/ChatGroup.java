@@ -1,5 +1,6 @@
 package org.example.travora.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +28,11 @@ private String userCreateChatId ;
 
 @OneToMany(cascade = CascadeType.ALL , mappedBy = "chatGroup")
     private List<Message> messages ;
+
+
+@ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "user_id")
+    User user ;
 
 }
