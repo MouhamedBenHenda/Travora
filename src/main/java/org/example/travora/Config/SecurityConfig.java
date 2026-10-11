@@ -72,10 +72,13 @@ public class SecurityConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(
-                List.of("http://localhost:4200")
-        );
-
+      
+    config.setAllowedOrigins(List.of(
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+        "http://192.168.0.9:8081",
+        "http://localhost:4200"
+    ));
         config.setAllowedMethods(
                 List.of(
                         "GET",
