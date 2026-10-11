@@ -27,7 +27,7 @@ This document describes the HTTP endpoints currently implemented by the Spring c
 | `GET` | `/api/events/{eventId}` | Path parameter `eventId` | `200 OK`, `EventResponse` |
 | `PUT` | `/api/events/{eventId}` | Path parameter `eventId`; `EventRequest` JSON | `200 OK`, `EventResponse` |
 | `DELETE` | `/api/events/{eventId}` | Path parameter `eventId` | `204 No Content`, empty body |
-| `POST` | `/api/v1/chat` | `ChatGroupRequest` JSON | `201 Created`, `ChatGroup` entity JSON |
+| `POST` | `/api/v1/chat/{createrId}` | Path parameter `createrId`; `ChatGroupRequest` JSON | `201 Created`, `ChatGroup` entity JSON |
 | `POST` | `/api/v2/message/{groupId}/messages` | Path parameter `groupId`; `MessageRequest` JSON | `201 Created`, `Message` entity JSON |
 
 The `/v1` and `/v2` prefixes appear only on authentication/chat and message routes respectively; the categories and events routes are unversioned.
@@ -128,16 +128,16 @@ Example:
 
 ### `ChatGroupRequest`
 
-Used by `POST /api/v1/chat`.
+Used by `POST /api/v1/chat/{createrId}`.
 
-| Property | JSON type |
-|---|---|
-| `name` | string |
-| `description` | string |
-| `userCreateChatId` | string |
-| `memberId` | array of strings |
+| Property | JSON type | Notes |
+|---|---|---|
+| `name` | string | |
+| `description` | string | |
+| `userCreateChatId` | string | Ignored by this endpoint; the creator is taken from `{createrId}` in the URL. |
+| `memberId` | array of strings | |
 
-The service initializes an empty member list when `memberId` is `null`.
+The creator is supplied by the `{createrId}` path parameter. The service sets the group's creator ID from that path value and does not use `userCreateChatId` from this request body. The service initializes an empty member list when `memberId` is `null`.
 
 Example:
 
@@ -145,7 +145,6 @@ Example:
 {
   "name": "Coastal Walk",
   "description": "Coordination for the walking tour",
-  "userCreateChatId": "user-id",
   "memberId": ["user-id", "another-user-id"]
 }
 ```
@@ -218,7 +217,7 @@ Returned by event create, read, update, and list endpoints.
 
 ### `ChatGroup` entity
 
-Returned directly by `POST /api/v1/chat` (not as `ChatGroupResponse`). The serialized entity includes its group data, member IDs, message collection, and inherited audit timestamps (`creLocalDate` and `lastDate`). Exact nested message serialization follows the model and Jackson annotations; this endpoint does not use a dedicated response DTO.
+Returned directly by `POST /api/v1/chat/{createrId}` (not as `ChatGroupResponse`). The serialized entity includes its group data, member IDs, message collection, and inherited audit timestamps (`creLocalDate` and `lastDate`). The associated user relationship is ignored for JSON serialization. This endpoint does not use a dedicated response DTO.
 
 ### `Message` entity
 
@@ -306,10 +305,13 @@ Returned directly by `POST /api/v2/message/{groupId}/messages`. Its model contai
 
 ### Chat and messages
 
-#### `POST /api/v1/chat`
+#### `POST /api/v1/chat/{createrId}`
 
+- **Path:** `createrId` (string; ID of an existing user)
 - **Body:** `ChatGroupRequest`
 - **Success:** `201 Created` with a serialized `ChatGroup` entity
+- **Service behavior:** Looks up the user identified by `createrId`, associates that user with the group, and sets `userCreateChatId` to the path value. The body's `userCreateChatId` property is ignored; `memberId` is copied when supplied and defaults to an empty list when `null`.
+- **Missing creator:** The service throws a runtime exception; no stable HTTP error mapping is declared.
 - **Notes:** The API only exposes group creation; service interface methods for listing, reading, updating, deleting, and managing group membership do not have controller routes.
 
 #### `POST /api/v2/message/{groupId}/messages`
