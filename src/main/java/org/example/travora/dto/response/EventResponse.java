@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EventResponse {
 
-
+    private String event ;
     private String id;
     private String description;
     private Date date_Begin_Event;

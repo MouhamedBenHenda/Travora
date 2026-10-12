@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventRequest {
-    ;
+    private String nameEvent ;
     private String description ;
     private Date date_Begin_Event ;
     private Date date_final_Event ;

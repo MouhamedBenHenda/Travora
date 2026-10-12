@@ -28,8 +28,8 @@ private String userCreateChatId ;
 
 @OneToMany(cascade = CascadeType.ALL , mappedBy = "chatGroup")
     private List<Message> messages ;
-
-
+@OneToOne(mappedBy = "chatGroup")
+private Event event ;
 @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")

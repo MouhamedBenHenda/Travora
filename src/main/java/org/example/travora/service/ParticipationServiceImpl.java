@@ -1,10 +1,7 @@
 package org.example.travora.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.travora.model.Event;
-import org.example.travora.model.Participation;
-import org.example.travora.model.ParticipationStatus;
-import org.example.travora.model.User;
+import org.example.travora.model.*;
 import org.example.travora.repository.EventRepository;
 import org.example.travora.repository.ParticipationRepository;
 import org.example.travora.repository.UserRepository;
@@ -39,11 +36,53 @@ public class ParticipationServiceImpl implements ParticipationService {
 
     @Override
     public Participation acceptParticipation(String participationId, String creatorId) {
-        return null;
+
+        Participation participation = participationRepository.findById(participationId).orElseThrow(() -> new RuntimeException("participation not found")) ;
+        Event event = participation.getEvent() ;
+        if (event == null) {
+            throw  new RuntimeException("event not found") ;
+
+        }
+
+        if(participation.getStatus() != ParticipationStatus.PENDING) {
+            throw new RuntimeException("the participation is not pending") ;
+        }
+        ChatGroup chatGroup = event.getChatGroup() ;
+        if (chatGroup == null) {
+            throw new RuntimeException("chat group not found") ;
+
+        }
+        participation.setChatGroup(chatGroup);
+        participation.setStatus(ParticipationStatus.ACCEPTED);
+        return  participationRepository.save(participation) ;
+
     }
 
     @Override
     public Participation rejectParticipation(String participationId, String creatorId) {
-        return null;
+        Participation participation = participationRepository.findById(participationId)
+                .orElseThrow(() -> new RuntimeException("Participation not found"));
+
+        Event event = participation.getEvent();
+
+        if (event == null) {
+            throw new RuntimeException("Event not found");
+        }
+
+
+        if (event.getUser() == null ||
+                !event.getUser().getId().equals(creatorId)) {
+            throw new RuntimeException("You are not the creator of this event");
+        }
+
+        // Vérifier que la demande est encore en attente
+        if (participation.getStatus() != ParticipationStatus.PENDING) {
+            throw new RuntimeException("Participation is not pending");
+        }
+
+        // Refuser la demande
+        participation.setStatus(ParticipationStatus.REJECTED);
+
+        return participationRepository.save(participation);
     }
 }

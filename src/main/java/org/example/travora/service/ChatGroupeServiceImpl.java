@@ -81,12 +81,42 @@ public class ChatGroupeServiceImpl  implements ChatGroupInterface {
 
     @Override
     public ChatGroup addMemberToGroup(String groupId, String memberId) {
-        return null;
+
+        ChatGroup chatGroup = chatGroupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Chat group not found" + groupId)) ;
+        if (memberId == null || memberId.isBlank()) {
+            throw new RuntimeException("member id cannot empty") ;
+
+        }
+        if (chatGroup.getMemberId() == null) {
+            chatGroup.setMemberId(new ArrayList<>());
+        }
+        if (!chatGroup.getMemberId().contains(memberId)){
+            chatGroup.getMemberId().add(memberId) ;
+
+        }
+        return chatGroupRepository.save(chatGroup);
     }
 
     @Override
-    public ChatGroup removeMemberFromGroup(String groupId, String memberId ) {
-        return null;
+    public ChatGroup removeMemberFromGroup(String groupId, String memberId) {
+
+        ChatGroup chatGroup = chatGroupRepository.findById(groupId)
+                .orElseThrow(() ->
+                        new RuntimeException("Chat group not found: " + groupId)
+                );
+
+        if (memberId == null || memberId.isBlank()) {
+            throw new RuntimeException("Member ID cannot be empty");
+        }
+
+        if (chatGroup.getMemberId() == null ||
+                !chatGroup.getMemberId().contains(memberId)) {
+            throw new RuntimeException("Member not found in this chat group");
+        }
+
+        chatGroup.getMemberId().remove(memberId);
+
+        return chatGroupRepository.save(chatGroup);
     }
 
     @Override

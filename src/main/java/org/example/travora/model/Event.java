@@ -21,7 +21,7 @@ public class Event {
 @Id
 
 private String id  = UUID.randomUUID().toString();
-    ;
+private String name ;
 private String description ;
 private Date date_Begin_Event ;
 private Date date_final_Event ;
@@ -61,5 +61,8 @@ private Long nbr_Of_Personne ;
 
     @Enumerated(EnumType.STRING)
     private EventType eventType ;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "event_id")
+    private ChatGroup chatGroup ;
 
 }
