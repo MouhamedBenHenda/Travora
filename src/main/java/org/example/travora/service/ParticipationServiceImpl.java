@@ -54,6 +54,10 @@ public class ParticipationServiceImpl implements ParticipationService {
         }
         participation.setChatGroup(chatGroup);
         participation.setStatus(ParticipationStatus.ACCEPTED);
+
+        User user = userRepository.findById(creatorId).orElseThrow(() -> new RuntimeException( "user not found")) ;
+        user.setRole(Role.NORMAL_ADVENTURER);
+        participation.setUser(user);
         return  participationRepository.save(participation) ;
 
     }
@@ -82,6 +86,10 @@ public class ParticipationServiceImpl implements ParticipationService {
 
         // Refuser la demande
         participation.setStatus(ParticipationStatus.REJECTED);
+        User user = userRepository.findById(creatorId).orElseThrow(() -> new RuntimeException("user notr found")) ;
+        user.setRole(Role.USER);
+
+        participation.setUser(user);
 
         return participationRepository.save(participation);
     }

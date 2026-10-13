@@ -215,7 +215,90 @@ Returned by event create, read, update, and list endpoints.
 | `userId` | string |
 | `categoryId` | string |
 
-### `ChatGroup` entity
+### `ChatGroup`
+
+Returned by chat group creation and read operations.
+
+| Property | JSON type | Notes |
+|---|---|---|
+| `id` | string | Group UUID. |
+| `name` | string | Group name. |
+| `description` | string | Group description. |
+| `userCreateChatId` | string | Creator user ID. |
+| `memberId` | array of strings | Member user IDs. |
+| `messages` | array of objects | Chat messages; may be `null` or empty. |
+
+### `Message`
+
+Returned by message creation and group message read endpoints.
+
+| Property | JSON type | Notes |
+|---|---|---|
+| `id` | string | Message UUID. |
+| `content` | string | Message text. |
+| `senderId` | string | Sender user ID. |
+| `messageType` | string | Enum value such as `TEXT`, `MEDIA`, or `AUDIO`. |
+| `messageState` | string | State enum. |
+| `mediaFilePath` | string or null | Optional media attachment path. |
+
+### `User`
+
+Returned by user read endpoints.
+
+| Property | JSON type | Notes |
+|---|---|---|
+| `id` | string | User UUID. |
+| `password` | string | Included in entity payload. |
+| `mail` | string | Email address. |
+| `firstname` | string | First name. |
+| `lastName` | string | Last name. |
+| `age` | integer | User age. |
+| `role` | string | User role. |
+| `userMessageStatus` | string | Message status enum. |
+| `lastSeen` | string (date-time) | Last online timestamp. |
+
+### `ChatGroupResponse`
+
+Returned by the chat group list/read endpoints.
+
+| Property | JSON type | Notes |
+|---|---|---|
+| `id` | string | Group UUID. |
+| `name` | string | Group name. |
+| `description` | string | Group description. |
+| `userCreateChatId` | string | Creator user ID. |
+| `memberId` | array of strings | Group member IDs. |
+| `messageIds` | array of strings | Message IDs. |
+| `createAt` | string (date-time) | Creation timestamp. |
+
+### `EventGroupResponse` / `MessageResponse`
+
+These DTO classes exist in the project but are not currently exposed by any controller route in the source reviewed here. They are part of the domain model layer and not part of the current public HTTP contract.
+
+## New endpoints found in the current source
+
+The project source also contains additional chat and user endpoints that were not in the original summary and should be included:
+
+| Method | Path | Request | Success response |
+|---|---|---|---|
+| `GET` | `/api/v1/chat` | None | `200 OK`, `List<ChatGroupResponse>` |
+| `GET` | `/api/v1/chat/{groupId}` | Path parameter `groupId` | `200 OK`, `ChatGroupResponse` |
+| `PUT` | `/api/v1/chat/{groupId}` | Path parameter `groupId`; `ChatGroupResponse` JSON | `200 OK`, `ChatGroup` |
+| `DELETE` | `/api/v1/chat/{groupId}` | Path parameter `groupId` | `204 No Content` |
+| `POST` | `/api/v1/chat/{groupId}/members/{memberId}` | Path params `groupId`, `memberId` | `200 OK`, `ChatGroup` |
+| `DELETE` | `/api/v1/chat/{groupId}/members/{memberId}` | Path params `groupId`, `memberId` | `200 OK`, `ChatGroup` |
+| `GET` | `/api/v1/chat/{groupId}/messages` | Path parameter `groupId` | `200 OK`, `List<Message>` |
+| `GET` | `/api/users/{userId}` | Path parameter `userId` | `200 OK`, `User` |
+| `GET` | `/api/users` | None | `200 OK`, `List<User>` |
+| `PUT` | `/api/users/{userId}` | Path parameter `userId`; `SignUpRequest` JSON | `200 OK`, `User` |
+
+## Notes
+
+- `SecurityConfig` uses `anyRequest().permitAll()`, so the app currently does not enforce role-based access at the API boundary.
+- `@Valid` is not used in the controllers, so validation rules are not formally expressed in the API contract.
+- The source does not define an application-wide `@ControllerAdvice` or global error response schema.
+- The project still contains additional DTOs and model classes that are not surfaced by active controller routes, so the list above reflects the current public API only.
+  entity
 
 Returned directly by `POST /api/v1/chat/{createrId}` (not as `ChatGroupResponse`). The serialized entity includes its group data, member IDs, message collection, and inherited audit timestamps (`creLocalDate` and `lastDate`). The associated user relationship is ignored for JSON serialization. This endpoint does not use a dedicated response DTO.
 
