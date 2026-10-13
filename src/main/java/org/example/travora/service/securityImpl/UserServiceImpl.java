@@ -1,6 +1,7 @@
 package org.example.travora.service.securityImpl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.travora.dto.request.SignUpRequest;
 import org.example.travora.model.User;
 import org.example.travora.repository.UserRepository;
 import org.example.travora.service.interfaceS.UserInterface;
@@ -19,9 +20,10 @@ public class UserServiceImpl implements UserInterface {
     }
 
     @Override
-    public User updateUser(String userId) {
+    public User updateUser(String userId, SignUpRequest signUpRequest) {
         return null;
     }
+
 
     @Override
     public List<User> gettAllUser() {
