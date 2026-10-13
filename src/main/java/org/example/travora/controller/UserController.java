@@ -1,4 +1,4 @@
-package org.example.travora.commen;
+package org.example.travora.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.travora.dto.request.SignUpRequest;
