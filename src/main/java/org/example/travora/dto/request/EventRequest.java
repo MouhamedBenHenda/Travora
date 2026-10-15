@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import org.example.travora.model.EventType;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,8 +26,8 @@ public class EventRequest {
     private Double latitude;
 
     private String CategoryId ;
-
-
+//information al local venue
+    private String venue ;
     private Double longitude;
 
     private Long nbr_Of_Personne ;
@@ -33,5 +35,7 @@ public class EventRequest {
     private  LocalDateTime finalDateofSale ;
     @Enumerated(EnumType.STRING)
     private EventType eventType ;
+//zedet hethith zedaa ta3 tikiyett
+    private List<CreateTicketTypeRequest> ticketTypeRequests = new ArrayList<>() ;
 
 }

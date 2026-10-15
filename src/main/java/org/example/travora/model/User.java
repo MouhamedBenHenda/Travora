@@ -11,9 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -50,6 +48,38 @@ private LocalDateTime lastSeen ;
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(getId(), user.getId()) && Objects.equals(getPassword(), user.getPassword()) && Objects.equals(getMail(), user.getMail()) && Objects.equals(getFirstname(), user.getFirstname()) && Objects.equals(getLastName(), user.getLastName()) && Objects.equals(getAge(), user.getAge()) && Objects.equals(getParticipations(), user.getParticipations()) && getRole() == user.getRole() && getUserMessageStatus() == user.getUserMessageStatus() && Objects.equals(getLastSeen(), user.getLastSeen()) && Objects.equals(getGroupEvents(), user.getGroupEvents()) && Objects.equals(getChatGroups(), user.getChatGroups());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getPassword(), getMail(), getFirstname(), getLastName(), getAge(), getParticipations(), getRole(), getUserMessageStatus(), getLastSeen(), getGroupEvents(), getChatGroups());
+    }
+
+    @ManyToMany
+@JoinTable(
+        name = "user_attending_events" ,
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "event_id")
+
+)
+private List<Event> attendingEvents = new ArrayList<>() ;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_staffing_events" ,
+            joinColumns = @JoinColumn(name = "user_id") ,
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+private List<Event> staffingEvents = new ArrayList<>() ;
+
+
+
 
 @OneToMany(cascade = CascadeType.ALL , mappedBy = "user")
 private List<GroupEvent> groupEvents ;
@@ -70,6 +100,7 @@ private List<ChatGroup> chatGroups ;
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+
 
     @Override
     public String getUsername() {
