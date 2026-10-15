@@ -28,9 +28,22 @@ This document describes the HTTP endpoints currently implemented by the Spring c
 | `PUT` | `/api/events/{eventId}` | Path parameter `eventId`; `EventRequest` JSON | `200 OK`, `EventResponse` |
 | `DELETE` | `/api/events/{eventId}` | Path parameter `eventId` | `204 No Content`, empty body |
 | `POST` | `/api/v1/chat/{createrId}` | Path parameter `createrId`; `ChatGroupRequest` JSON | `201 Created`, `ChatGroup` entity JSON |
+| `GET` | `/api/v1/chat` | None | `200 OK`, `ChatGroupResponse[]` |
+| `GET` | `/api/v1/chat/{groupId}` | Path parameter `groupId` | `200 OK`, `ChatGroupResponse` |
+| `PUT` | `/api/v1/chat/{groupId}` | Path parameter `groupId`; `ChatGroupResponse` JSON | `200 OK`, `ChatGroup` entity JSON (currently null from service) |
+| `DELETE` | `/api/v1/chat/{groupId}` | Path parameter `groupId` | `204 No Content`, empty body |
+| `POST` | `/api/v1/chat/{groupId}/members/{memberId}` | Path parameters `groupId`, `memberId` | `200 OK`, `ChatGroup` entity JSON |
+| `DELETE` | `/api/v1/chat/{groupId}/members/{memberId}` | Path parameters `groupId`, `memberId` | `200 OK`, `ChatGroup` entity JSON |
+| `GET` | `/api/v1/chat/{groupId}/messages` | Path parameter `groupId` | `200 OK`, `Message[]` |
 | `POST` | `/api/v2/message/{groupId}/messages` | Path parameter `groupId`; `MessageRequest` JSON | `201 Created`, `Message` entity JSON |
+| `GET` | `/api/users` | None | `200 OK`, `User[]` entity JSON |
+| `GET` | `/api/users/{userId}` | Path parameter `userId` | `200 OK`, `User` entity JSON |
+| `PUT` | `/api/users/{userId}` | Path parameter `userId`; `SignUpRequest` JSON | `200 OK`, `User` entity JSON |
+| `POST` | `/api/v1/participations/request/{userId}/{eventId}` | Path parameters `userId`, `eventId`; no body | `200 OK`, `Participation` entity JSON |
+| `PUT` | `/api/v1/participations/accept/{participationId}/{creatorId}` | Path parameters `participationId`, `creatorId`; no body | `200 OK`, `Participation` entity JSON |
+| `PUT` | `/api/v1/participations/reject/{participationId}/{creatorId}` | Path parameters `participationId`, `creatorId`; no body | `200 OK`, `Participation` entity JSON |
 
-The `/v1` and `/v2` prefixes appear only on authentication/chat and message routes respectively; the categories and events routes are unversioned.
+Authentication, chat, and participation use `/api/v1`; messages use `/api/v2`; categories, events, and users are unversioned.
 
 ## Request body types
 
@@ -100,14 +113,20 @@ Used by `POST /api/events/add/{userId}` and `PUT /api/events/{eventId}`.
 
 | Property | JSON type | Notes |
 |---|---|---|
+| `nameEvent` | string | Used by the update service; not copied into a new event by the current create service. |
 | `description` | string | |
 | `date_Begin_Event` | string (date-time) | Java `Date`; Jackson is configured not to serialize dates as numeric timestamps. |
 | `date_final_Event` | string (date-time) | Java `Date`; Jackson is configured not to serialize dates as numeric timestamps. |
 | `placeEvent` | string | |
 | `latitude` | number | Java `Double`. |
-| `categoryId` | string | Backing Java field is `CategoryId`; the service uses this value to look up the category. |
+| `categoryId` | string | Backing Java field is `CategoryId`; used to look up the category. |
+| `venue` | string | Present in the request DTO but not copied by the current event service. |
 | `longitude` | number | Java `Double`. |
 | `nbr_Of_Personne` | integer | Java `Long`. |
+| `startDateSale` | string (date-time) | Java `LocalDateTime`. |
+| `finalDateofSale` | string (date-time) | Java `LocalDateTime`. |
+| `eventType` | string | `FREE` or `PRICE`. |
+| `ticketTypeRequests` | array | Each `CreateTicketTypeRequest` has `name`, `price`, and `totalAvailable`; currently not processed by `EventServiceImpl`. |
 
 The event creator ID is supplied as the `{userId}` path parameter, not in this body.
 
@@ -115,6 +134,7 @@ Example:
 
 ```json
 {
+  "nameEvent": "Coastal walking tour",
   "description": "Coastal walking tour",
   "date_Begin_Event": "2026-11-15T09:00:00Z",
   "date_final_Event": "2026-11-15T13:00:00Z",
@@ -122,7 +142,18 @@ Example:
   "latitude": 36.8700,
   "categoryId": "category-id",
   "longitude": 10.3470,
-  "nbr_Of_Personne": 12
+  "nbr_Of_Personne": 12,
+  "startDateSale": "2026-11-10T08:00:00",
+  "finalDateofSale": "2026-11-12T18:00:00",
+  "eventType": "PRICE",
+  "venue": "Harbor entrance",
+  "ticketTypeRequests": [
+    {
+      "name": "Standard",
+      "price": 25.0,
+      "totalAvailable": 12
+    }
+  ]
 }
 ```
 
@@ -203,6 +234,7 @@ Returned by event create, read, update, and list endpoints.
 
 | Property | JSON type |
 |---|---|
+| `event` | string |
 | `id` | string |
 | `description` | string |
 | `date_Begin_Event` | string (date-time) |
@@ -214,10 +246,24 @@ Returned by event create, read, update, and list endpoints.
 | `role` | string |
 | `userId` | string |
 | `categoryId` | string |
+| `startDateSale` | string (date-time) |
+| `finalDateofSale` | string (date-time) |
+| `eventType` | string |
 
-### `ChatGroup`
+The current mapper does not set `event` (or the event name), so `event` will be null in the mapped response. `venue` and `ticketTypeRequests` are not included in `EventResponse`.
 
-Returned by chat group creation and read operations.
+### `Participation`
+
+Returned directly by the participation endpoints. The associated `user`, `event`, `chat`, and `chatGroup` relationships are annotated `@JsonIgnore`; the JSON response therefore exposes the participation's own fields, including `id` and `status`.
+
+| Property | JSON type | Notes |
+|---|---|---|
+| `id` | string | Participation UUID. |
+| `status` | string | `PENDING`, `ACCEPTED`, or `REJECTED`. |
+
+### `ChatGroup` entity
+
+Returned directly by chat group creation, update, and member-management operations. List and get-by-ID return `ChatGroupResponse` instead.
 
 | Property | JSON type | Notes |
 |---|---|---|
@@ -271,13 +317,13 @@ Returned by the chat group list/read endpoints.
 | `messageIds` | array of strings | Message IDs. |
 | `createAt` | string (date-time) | Creation timestamp. |
 
-### `EventGroupResponse` / `MessageResponse`
+### Unused response DTOs
 
-These DTO classes exist in the project but are not currently exposed by any controller route in the source reviewed here. They are part of the domain model layer and not part of the current public HTTP contract.
+`EventGroupResponse` and `MessageResponse` exist in the project but are not currently returned by any controller route. They are not part of the current public HTTP contract.
 
-## New endpoints found in the current source
+## Additional chat and user endpoints
 
-The project source also contains additional chat and user endpoints that were not in the original summary and should be included:
+These routes are also implemented in the current controllers and are listed in the endpoint inventory above:
 
 | Method | Path | Request | Success response |
 |---|---|---|---|
@@ -297,10 +343,14 @@ The project source also contains additional chat and user endpoints that were no
 - `SecurityConfig` uses `anyRequest().permitAll()`, so the app currently does not enforce role-based access at the API boundary.
 - `@Valid` is not used in the controllers, so validation rules are not formally expressed in the API contract.
 - The source does not define an application-wide `@ControllerAdvice` or global error response schema.
-- The project still contains additional DTOs and model classes that are not surfaced by active controller routes, so the list above reflects the current public API only.
-  entity
+- `GET /api/users` and `GET /api/users/{userId}` return the `User` entity directly, which includes the `password` property. Do not expose these responses to untrusted clients; the current API does not redact this field.
+- `PUT /api/v1/chat/{groupId}` is routed but the service implementation currently returns `null`, so it responds `200 OK` with a null response body rather than an updated group.
+- `EventRequest` now includes `venue` and `ticketTypeRequests`, but the current `EventServiceImpl` does not copy/process those values. The create implementation also does not copy `nameEvent`; the update implementation does.
+- The project has DTOs and model classes that are not surfaced by active controller routes; they are not part of the public API unless a controller exposes them.
 
-Returned directly by `POST /api/v1/chat/{createrId}` (not as `ChatGroupResponse`). The serialized entity includes its group data, member IDs, message collection, and inherited audit timestamps (`creLocalDate` and `lastDate`). The associated user relationship is ignored for JSON serialization. This endpoint does not use a dedicated response DTO.
+### ChatGroup entity serialization
+
+Returned directly by chat creation, update, and member-management routes (not as `ChatGroupResponse`). The serialized entity includes its group data, member IDs, message collection, and inherited audit timestamps (`creLocalDate` and `lastDate`). The associated user relationship is ignored for JSON serialization. The update service currently returns `null`.
 
 ### `Message` entity
 
@@ -395,7 +445,7 @@ Returned directly by `POST /api/v2/message/{groupId}/messages`. Its model contai
 - **Success:** `201 Created` with a serialized `ChatGroup` entity
 - **Service behavior:** Looks up the user identified by `createrId`, associates that user with the group, and sets `userCreateChatId` to the path value. The body's `userCreateChatId` property is ignored; `memberId` is copied when supplied and defaults to an empty list when `null`.
 - **Missing creator:** The service throws a runtime exception; no stable HTTP error mapping is declared.
-- **Notes:** The API only exposes group creation; service interface methods for listing, reading, updating, deleting, and managing group membership do not have controller routes.
+- **Notes:** The controller also exposes chat listing, reading, updating, deleting, member management, and message listing routes (see the endpoint inventory). The update service currently returns `null`.
 
 #### `POST /api/v2/message/{groupId}/messages`
 
@@ -404,6 +454,48 @@ Returned directly by `POST /api/v2/message/{groupId}/messages`. Its model contai
 - **Success:** `201 Created` with a serialized `Message` entity
 - **Notes:** The service uses the path `groupId` to find the group. The request's `chatGroupId` and `id` are not used. A missing group causes a runtime exception with no documented error mapping.
 
+### Users
+
+#### `GET /api/users`
+
+- **Success:** `200 OK` with a list of serialized `User` entities.
+- **Important:** The entity includes the `password` field in its JSON representation; this route currently returns it without redaction.
+
+#### `GET /api/users/{userId}`
+
+- **Path:** `userId` (string)
+- **Success:** `200 OK` with a serialized `User` entity.
+- **Important:** The entity includes the `password` field in its JSON representation; this route currently returns it without redaction.
+
+#### `PUT /api/users/{userId}`
+
+- **Path:** `userId` (string)
+- **Body:** `SignUpRequest`
+- **Success:** `200 OK` with a serialized `User` entity.
+
+### Participation
+
+#### `POST /api/v1/participations/request/{userId}/{eventId}`
+
+- **Path:** `userId`, `eventId` (strings)
+- **Body:** None
+- **Success:** `200 OK` with a serialized `Participation` entity; the initial status is `PENDING`.
+- **Failure behavior:** Throws a runtime exception if the user or event does not exist, or if a participation for that user/event already exists. There is no stable error mapping.
+
+#### `PUT /api/v1/participations/accept/{participationId}/{creatorId}`
+
+- **Path:** `participationId`, `creatorId` (strings)
+- **Body:** None
+- **Success:** `200 OK` with a serialized `Participation` entity with status `ACCEPTED`.
+- **Failure behavior:** Throws a runtime exception if the participation/event/chat group is missing or the participation is not pending. The current implementation looks up `creatorId` and assigns that user to the participation, rather than checking that the ID belongs to the event creator.
+
+#### `PUT /api/v1/participations/reject/{participationId}/{creatorId}`
+
+- **Path:** `participationId`, `creatorId` (strings)
+- **Body:** None
+- **Success:** `200 OK` with a serialized `Participation` entity with status `REJECTED`.
+- **Failure behavior:** Throws a runtime exception if the participation/event is missing, the path `creatorId` is not the event creator, or the participation is not pending. There is no stable error mapping. On success, the implementation also changes the creator user's role to `USER`.
+
 ## Not exposed as HTTP endpoints
 
-The source contains participation-related services and domain types but no participation controller or participation HTTP routes. The same applies to user/profile operations, event-group management and application management/health endpoints. APIs or functions listed only as proposed/planned in `docs/PROJECT_DOCUMENTATION.md` are not included here.
+Event-group management, ticket-type management, and application management/health APIs have DTOs or model/service code but no routes in the current controller source. Features mentioned only as proposed or planned in `docs/PROJECT_DOCUMENTATION.md` are not included in this API contract.
