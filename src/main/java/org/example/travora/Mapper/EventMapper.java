@@ -11,7 +11,7 @@ public class EventMapper {
 
 
             EventResponse response = new EventResponse();
-
+           response.setNameEvent(event.getName());
             response.setId(event.getId());
             response.setDescription(event.getDescription());
             response.setDate_Begin_Event(event.getDate_Begin_Event());
@@ -20,7 +20,7 @@ public class EventMapper {
             response.setLatitude(event.getLatitude());
             response.setLongitude(event.getLongitude());
             response.setNbr_Of_Personne(event.getNbr_Of_Personne());
-            response.setRole(event.getRole());
+            response.setRole(event.getEventType());
             response.setStartDateSale(event.getStartDateSale());
             response.setFinalDateofSale(event.getFinalDateofSale());
             response.setEventType(event.getEventType());

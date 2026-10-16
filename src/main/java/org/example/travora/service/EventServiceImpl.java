@@ -28,10 +28,12 @@ public class EventServiceImpl implements EventService {
     private final ChatGroupInterface chatGroupInterface ;
     private final EventMapper eventMapper ;
     @Override
-    public EventResponse addEvent(EventRequest eventRequest ,String userId ) {
+    public EventResponse addEvent(EventRequest eventRequest, String userId) {
 
 
-        Event event = new Event() ;
+        Event event = new Event();
+
+        event.setName(eventRequest.getNameEvent());
         event.setDescription(eventRequest.getDescription());
         event.setDate_Begin_Event(eventRequest.getDate_Begin_Event());
         event.setDate_final_Event(eventRequest.getDate_final_Event());
@@ -39,28 +41,36 @@ public class EventServiceImpl implements EventService {
         event.setLatitude(eventRequest.getLatitude());
         event.setLongitude(eventRequest.getLongitude());
         event.setNbr_Of_Personne(eventRequest.getNbr_Of_Personne());
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not founnd")) ;
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("user not found"));
         user.setRole(Role.CREATOR);
-        userRepository.save(user) ;
+        userRepository.save(user);
         event.setUser(user);
-
-        Category category = categoryRepository.findById(eventRequest.getCategoryId()).orElseThrow(() -> new RuntimeException("category not found")) ;
+        event.setEventSatatusEnum(EventSatatusEnum.DRAFT);
+        Category category = categoryRepository.findById(eventRequest.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("category not found"));
         event.setCategory(category);
         event.setEventType(eventRequest.getEventType());
         event.setStartDateSale(eventRequest.getStartDateSale());
         event.setFinalDateofSale(eventRequest.getFinalDateofSale());
-        ChatGroupRequest chatGroupRequest = new ChatGroupRequest() ;
+        ChatGroupRequest chatGroupRequest = new ChatGroupRequest();
+
         chatGroupRequest.setName(event.getName());
         chatGroupRequest.setDescription(eventRequest.getDescription());
         chatGroupRequest.setMemberId(new ArrayList<>());
 
-        ChatGroup chatGroup1 = chatGroupInterface.createChatGroupe(chatGroupRequest , event.getUser().getId()) ;
-        event.setChatGroup(chatGroup1);
-        Event savedEvent = eventRepository.save(event) ;
-        return  eventMapper.fromEvent(savedEvent) ;
+        ChatGroup chatGroup = chatGroupInterface.createChatGroupe(
+                chatGroupRequest,
+                user.getId()
+        );
+
+        event.setChatGroup(chatGroup);
 
 
+        Event savedEvent = eventRepository.save(event);
+
+
+        return eventMapper.fromEvent(savedEvent);
     }
 
     @Override
@@ -84,7 +94,7 @@ public class EventServiceImpl implements EventService {
 
             Category category = categoryRepository.findById(eventRequest.getCategoryId()).orElseThrow(() -> new RuntimeException("category not found")) ;
             event.setCategory(category);
-
+            event.setEventSatatusEnum(EventSatatusEnum.DRAFT);
             ChatGroupRequest chatGroup = new ChatGroupRequest() ;
             chatGroup.setName(eventRequest.getNameEvent());
             chatGroup.setDescription(eventRequest.getDescription());

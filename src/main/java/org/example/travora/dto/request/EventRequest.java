@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.travora.model.EventSatatusEnum;
 import org.example.travora.model.EventType;
 
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ public class EventRequest {
     private String placeEvent ;
     private Double latitude;
 
-    private String CategoryId ;
+    private String categoryId;
 //information al local venue
     private String venue ;
     private Double longitude;
@@ -37,5 +38,7 @@ public class EventRequest {
     private EventType eventType ;
 //zedet hethith zedaa ta3 tikiyett
     private List<CreateTicketTypeRequest> ticketTypeRequests = new ArrayList<>() ;
+
+
 
 }

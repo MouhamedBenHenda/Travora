@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventResponse {
-
+    private String nameEvent ;
     private String event ;
     private String id;
     private String description;
@@ -27,7 +27,7 @@ public class EventResponse {
     private Double latitude;
     private Double longitude;
     private Long nbr_Of_Personne;
-    private Role role;
+    private EventType role;
 
     private String userId;
     private String categoryId;
