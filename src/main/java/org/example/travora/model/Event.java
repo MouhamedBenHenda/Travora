@@ -80,7 +80,7 @@ private Long nbr_Of_Personne ;
 @LastModifiedDate
     @Column(name = "updated_at" , nullable = false)
     private LocalDateTime updatedAt ;
-@OneToMany(mappedBy = "event " , cascade = CascadeType.ALL)
+@OneToMany(mappedBy = "event" , cascade = CascadeType.ALL)
     private List<TicketType> ticketTypes = new ArrayList<>() ;
 
     @Override
