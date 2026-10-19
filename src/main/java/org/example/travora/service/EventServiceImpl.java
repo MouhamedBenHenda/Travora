@@ -88,6 +88,16 @@ public class EventServiceImpl implements EventService {
             event.setLongitude(eventRequest.getLongitude());
             event.setNbr_Of_Personne(eventRequest.getNbr_Of_Personne());
 
+
+    List<TicketType> ticketsTypeCreate = event.getTicketTypes().stream().map(ticketType -> {
+         TicketType ticketTypeCreate = new TicketType() ;
+         ticketTypeCreate.setName(ticketTypeCreate.getName());
+         ticketTypeCreate.setPrice(ticketTypeCreate.getPrice());
+         ticketTypeCreate.setDescription(ticketTypeCreate.getDescription());
+         ticketTypeCreate.setTotalAvailable(ticketType.getTotalAvailable());
+         return ticketTypeCreate ;
+     }).toList() ;
+            event.setTicketTypes(ticketsTypeCreate);
             event.setEventType(eventRequest.getEventType());
             event.setStartDateSale(eventRequest.getStartDateSale());
             event.setFinalDateofSale(eventRequest.getFinalDateofSale());

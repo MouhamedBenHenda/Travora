@@ -62,6 +62,7 @@ private LocalDateTime lastSeen ;
     }
 
     @ManyToMany
+    @JsonIgnore
 @JoinTable(
         name = "user_attending_events" ,
         joinColumns = @JoinColumn(name = "user_id"),
@@ -71,6 +72,7 @@ private LocalDateTime lastSeen ;
 private List<Event> attendingEvents = new ArrayList<>() ;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "user_staffing_events" ,
             joinColumns = @JoinColumn(name = "user_id") ,

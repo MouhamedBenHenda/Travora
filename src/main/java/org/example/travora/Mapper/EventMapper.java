@@ -14,6 +14,7 @@ public class EventMapper {
            response.setNameEvent(event.getName());
             response.setId(event.getId());
             response.setDescription(event.getDescription());
+
             response.setDate_Begin_Event(event.getDate_Begin_Event());
             response.setDate_final_Event(event.getDate_final_Event());
             response.setPlaceEvent(event.getPlaceEvent());

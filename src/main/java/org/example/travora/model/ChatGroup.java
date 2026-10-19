@@ -29,6 +29,7 @@ private String userCreateChatId ;
 @OneToMany(cascade = CascadeType.ALL , mappedBy = "chatGroup")
     private List<Message> messages ;
 @OneToOne(mappedBy = "chatGroup")
+@JsonIgnore//zeddeeett hathhiii
 private Event event ;
 @ManyToOne
     @JsonIgnore
