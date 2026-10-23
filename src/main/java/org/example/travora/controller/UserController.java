@@ -2,6 +2,7 @@ package org.example.travora.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.travora.dto.request.SignUpRequest;
+import org.example.travora.dto.response.UserResponse;
 import org.example.travora.model.User;
 import org.example.travora.service.interfaceS.UserInterface;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +19,14 @@ public class UserController {
 
 
     @GetMapping("/{userId}")
-    public User getUser(@PathVariable String userId) {
-        return userInterface.getUser(userId);
+    public UserResponse getUser(@PathVariable String userId) {
+        return userInterface.getUserById(userId);
     }
 
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userInterface.gettAllUser();
+    public List<UserResponse> getAllUsers() {
+        return userInterface.getAllUsers();
     }
 
     @PutMapping("/{userId}")

@@ -2,6 +2,7 @@ package org.example.travora.service.interfaceS;
 
 import org.example.travora.dto.request.EventRequest;
 import org.example.travora.dto.response.EventResponse;
+import org.example.travora.model.EventSatatusEnum;
 
 import java.util.List;
 
@@ -14,5 +15,9 @@ public interface EventService {
     public EventResponse getEventbyId(String eventId) ;
 
 
+
+    public List<EventResponse> getEventAllByOrganiser(String userId) ;
+
+    public List<EventResponse> getAllEventByStauts(EventSatatusEnum eventSatatusEnum) ;
 
 }

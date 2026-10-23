@@ -1,8 +1,9 @@
-package org.example.travora.controller;
+        package org.example.travora.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.travora.dto.request.EventRequest;
 import org.example.travora.dto.response.EventResponse;
+import org.example.travora.model.EventSatatusEnum;
 import org.example.travora.service.interfaceS.EventService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,11 @@ public class EventController {
     // Ajouter un événement
     @PostMapping("/add/{userId}")
     public ResponseEntity<EventResponse> addEvent(
-            @RequestBody EventRequest eventRequest , @PathVariable String userId) {
+            @RequestBody EventRequest eventRequest,
+            @PathVariable String userId) {
 
-        EventResponse response = eventService.addEvent(eventRequest , userId);
+        EventResponse response =
+                eventService.addEvent(eventRequest, userId);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -67,5 +70,27 @@ public class EventController {
         EventResponse event = eventService.getEventbyId(eventId);
 
         return ResponseEntity.ok(event);
+    }
+
+    // Récupérer tous les événements d'un organisateur
+    @GetMapping("/organiser/{userId}")
+    public ResponseEntity<List<EventResponse>> getEventAllByOrganiser(
+            @PathVariable String userId) {
+
+        List<EventResponse> events =
+                eventService.getEventAllByOrganiser(userId);
+
+        return ResponseEntity.ok(events);
+    }
+
+    // Récupérer les événements par statut (PUBLISHED, DRAFT, etc.)
+    @GetMapping("/status/{eventSatatusEnum}")
+    public ResponseEntity<List<EventResponse>> getAllEventByStauts(
+            @PathVariable EventSatatusEnum eventSatatusEnum) {
+
+        List<EventResponse> events =
+                eventService.getAllEventByStauts(eventSatatusEnum);
+
+        return ResponseEntity.ok(events);
     }
 }

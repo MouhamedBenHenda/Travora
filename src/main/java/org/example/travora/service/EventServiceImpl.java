@@ -142,4 +142,24 @@ public class EventServiceImpl implements EventService {
 
         return eventMapper.fromEvent(event);
     }
+
+
+//zedet hethiii
+    @Override
+    public List<EventResponse> getEventAllByOrganiser(String userId) {
+        List<Event> events = eventRepository.findAll() ;
+
+        return events.stream().filter(event -> event.getUser().getId().equals(userId)).map(eventMapper:: fromEvent).toList() ;
+    }
+//zedet hethiii fel acceuil ta3 user yothrou published
+    @Override
+    public List<EventResponse> getAllEventByStauts(EventSatatusEnum eventSatatusEnum) {
+        List<Event> events = eventRepository.findByEventSatatusEnum(eventSatatusEnum);
+        return events.stream()
+                .map(eventMapper::fromEvent)
+                .toList();
+    }
+
+
+
 }
